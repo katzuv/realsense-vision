@@ -7,6 +7,7 @@ from pydantic import ValidationError
 import app.core.logging_config as logging_config
 from models.models import RootConfig
 from utils.utils import singleton
+from utils.chip_detector import resolve_chip_type
 
 logger = logging_config.get_logger(__name__)
 
@@ -55,6 +56,15 @@ class ConfigManager:
         raw = self._read_raw()
         try:
             self._config = RootConfig.model_validate(raw)
+            # Resolve chip type (auto-detect if set to "auto")
+            resolved_chip = resolve_chip_type(self._config.rknn_chip_type)
+            if resolved_chip != self._config.rknn_chip_type:
+                # Update the config with resolved chip type
+                self._config.rknn_chip_type = resolved_chip
+                logger.info(
+                    f"Resolved chip type from 'auto' to '{resolved_chip}'",
+                    "load-config"
+                )
         except ValidationError as exc:
             raise ConfigError(f"Invalid configuration: {exc}") from exc
         return self._config

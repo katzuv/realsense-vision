@@ -7,6 +7,7 @@ Integrate Intel RealSense cameras with FRC robots seamlessly.
 ## Table of Contents
 
 * [Installation](#installation)
+* [Chip Auto-Detection](#chip-auto-detection)
 * [Model Training](#model-training)
 
   * [Dataset](#dataset)
@@ -51,13 +52,33 @@ Integrate Intel RealSense cameras with FRC robots seamlessly.
 
 2. **Install Dependencies**
 
-   * Follow the same installation steps as Orange Pi 5, but ensure `rknn_chip_type` in `config.yaml` is set to `qcs6490`.
+   * Follow the same installation steps as Orange Pi 5.
+   * The chip type will be auto-detected by default.
    * The model will be converted to ONNX format for Qualcomm NPU compatibility.
 
-3. **Configure for QCS6490**
+3. **Configure for QCS6490 (Optional)**
 
-   * Edit `config.yaml` and set: `rknn_chip_type: qcs6490`
+   * The system auto-detects the chip type by default (`rknn_chip_type: auto` in `config.yaml`).
+   * For manual configuration, edit `config.yaml` and set: `rknn_chip_type: qcs6490`
    * Models will be exported to ONNX format which can leverage the Qualcomm NPU through ONNX Runtime with QNN execution provider.
+
+## Chip Auto-Detection
+
+The system automatically detects your hardware platform by default. The `rknn_chip_type` setting in `config.yaml` supports:
+
+* **`auto`** (default) - Automatically detects the chip type from system information
+* **`rk3588`** - Rockchip RK3588 (Orange Pi 5)
+* **`rk3588s`** - Rockchip RK3588s (Orange Pi 5 Plus/Pro)
+* **`rk3576`** - Rockchip RK3576
+* **`rk3568`** - Rockchip RK3568
+* **`qcs6490`** - Qualcomm QCS6490 (Rubik Pi 3)
+
+The auto-detection reads device tree information from `/proc/device-tree/` and `/sys/firmware/devicetree/base/` to identify the platform. If detection fails, it defaults to `rk3588`.
+
+**Manual Override:** You can manually set the chip type if auto-detection doesn't work correctly:
+```yaml
+rknn_chip_type: qcs6490  # Override auto-detection
+```
 
 ## Model Training
 
