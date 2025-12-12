@@ -81,5 +81,5 @@ default_config = RootConfig(
         server="10.59.87.2", table="AdvantageKit/RealsenseVision"
     ),
     pipeline=Pipeline(args=[], type="regular"),
-    rknn_chip_type="auto",
+    rknn_chip_type="rk3588",
 )
