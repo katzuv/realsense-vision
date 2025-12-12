@@ -55,16 +55,20 @@ class ConfigManager:
         """Force re-read of the file and validate via Pydantic models."""
         raw = self._read_raw()
         try:
-            self._config = RootConfig.model_validate(raw)
+            config = RootConfig.model_validate(raw)
             # Resolve chip type (auto-detect if set to "auto")
-            resolved_chip = resolve_chip_type(self._config.rknn_chip_type)
-            if resolved_chip != self._config.rknn_chip_type:
-                # Update the config with resolved chip type
-                self._config.rknn_chip_type = resolved_chip
+            resolved_chip = resolve_chip_type(config.rknn_chip_type)
+            if resolved_chip != config.rknn_chip_type:
+                # Create new config with resolved chip type
+                config_dict = config.model_dump()
+                config_dict['rknn_chip_type'] = resolved_chip
+                self._config = RootConfig.model_validate(config_dict)
                 logger.info(
                     f"Resolved chip type from 'auto' to '{resolved_chip}'",
                     "load-config"
                 )
+            else:
+                self._config = config
         except ValidationError as exc:
             raise ConfigError(f"Invalid configuration: {exc}") from exc
         return self._config

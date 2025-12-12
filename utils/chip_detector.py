@@ -33,7 +33,7 @@ def detect_chip_type() -> str:
     for path in device_tree_paths:
         try:
             if os.path.exists(path):
-                with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                with open(path, 'r', encoding='utf-8', errors='replace') as f:
                     # Read content and convert to lowercase for case-insensitive matching
                     content = f.read().lower().replace('\x00', ' ')
                     
