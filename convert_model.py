@@ -12,12 +12,20 @@ def convert_model(model_path, chip="rk3588", imgsz=640):
     cwd = os.path.dirname(model_path)
     model_file = os.path.basename(model_path)
 
+    # Use ONNX format for QCS6490 (Qualcomm NPU), RKNN for Rockchip chips
+    if chip == "qcs6490":
+        export_format = "onnx"
+        name = "qcs6490"
+    else:
+        export_format = "rknn"
+        name = chip
+
     cmd = [
         os.path.dirname(sys.executable) + "/yolo",
         "export",
         f"model={model_file}",
-        "format=rknn",
-        f"name={chip}",
+        f"format={export_format}",
+        f"name={name}",
         f"imgsz={imgsz}",
     ]
 

@@ -2,7 +2,7 @@
 
 Integrate Intel RealSense cameras with FRC robots seamlessly.
 
-> **Note:** Tested only on Orange Pi 5, and Orange Pi 5 Pro. Other platforms are not guaranteed to work.
+> **Note:** Tested only on Orange Pi 5, Orange Pi 5 Pro, and Rubik Pi 3 (QCS6490). Other platforms are not guaranteed to work.
 
 ## Table of Contents
 
@@ -17,6 +17,8 @@ Integrate Intel RealSense cameras with FRC robots seamlessly.
 * [License](#license)
 
 ## Installation
+
+### For Orange Pi 5/5 Pro (RK3588)
 
 1. **Flash Ubuntu Server Image**
 
@@ -39,6 +41,23 @@ Integrate Intel RealSense cameras with FRC robots seamlessly.
 3. **Access the Dashboard**
 
    * Visit `http://<orange-pi-ip>:5000` in your browser.
+
+### For Rubik Pi 3 (QCS6490)
+
+1. **Setup Device**
+
+   * Use the Rubik Pi 3 with a compatible Linux distribution.
+   * Ensure the Qualcomm Neural Processing SDK (SNPE or QNN) is properly configured for NPU acceleration.
+
+2. **Install Dependencies**
+
+   * Follow the same installation steps as Orange Pi 5, but ensure `rknn_chip_type` in `config.yaml` is set to `qcs6490`.
+   * The model will be converted to ONNX format for Qualcomm NPU compatibility.
+
+3. **Configure for QCS6490**
+
+   * Edit `config.yaml` and set: `rknn_chip_type: qcs6490`
+   * Models will be exported to ONNX format which can leverage the Qualcomm NPU through ONNX Runtime with QNN execution provider.
 
 ## Model Training
 
@@ -82,11 +101,13 @@ Use this [Kaggle Notebook](https://www.kaggle.com/code/adarwas/yolov11-traning) 
 
 3. **Conversion**
 
-   * The dashboard will convert the model to RKNN format automatically.
+   * The dashboard will convert the model automatically:
+     * RKNN format for RK3588/RK3576/RK3568 chips
+     * ONNX format for QCS6490 (Qualcomm NPU)
 
 4. **Configure Detection**
 
-   * Set the pipeline type to `detection` and define the model path in `args` (e.g. `./uploads/best_rknn_model`).
+   * Set the pipeline type to `detection` and define the model path in `args` (e.g. `./uploads/best_rknn_model` or `./uploads/best_qcs6490_model`).
    * Update this via `config.yaml` or the dashboard config page.
 
 ## Network Tables

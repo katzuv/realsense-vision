@@ -21,4 +21,4 @@ pipeline:
   args:
   - best_good_rknn_model
   type: DetectionDepthPipeline
-rknn_chip_type: rk3588
+rknn_chip_type: rk3588  # Options: rk3588, rk3588s, rk3576, rk3568, qcs6490
