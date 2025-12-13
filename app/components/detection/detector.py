@@ -1,3 +1,4 @@
+import os
 from ultralytics import YOLO
 
 import app.core.logging_config as logging_config
@@ -27,23 +28,18 @@ class YOLODetector:
             # For QCS6490, configure ONNX Runtime to use QNN execution provider for NPU acceleration
             try:
                 import onnxruntime as ort
-                # Configure QNN execution provider for Qualcomm NPU
-                providers = [
-                    (
-                        "QNNExecutionProvider",
-                        {
-                            "backend_path": "libQnnHtp.so",
-                            "performance_mode": "high_performance",
-                            "device_id": 0
-                        }
-                    ),
-                    "CPUExecutionProvider"  # Fallback to CPU if QNN is not available
-                ]
-                logger.info(f"Configured ONNX Runtime providers: {[p[0] if isinstance(p, tuple) else p for p in providers]}", operation="init")
-                # Note: ultralytics YOLO will use these providers when loading ONNX models
-                # Set the environment to use these providers
-                import os
+                # Set environment variable to enable QNN execution provider
+                # This will be used by ultralytics YOLO when loading ONNX models
                 os.environ["ORT_EXECUTION_PROVIDERS"] = "QNNExecutionProvider,CPUExecutionProvider"
+                
+                # Log available providers
+                available_providers = ort.get_available_providers()
+                logger.info(f"ONNX Runtime available providers: {available_providers}", operation="init")
+                
+                if "QNNExecutionProvider" in available_providers:
+                    logger.info("QNN execution provider is available for NPU acceleration", operation="init")
+                else:
+                    logger.warning("QNN execution provider not available, will use CPU", operation="init")
             except ImportError:
                 logger.warning("onnxruntime not available, using default providers", operation="init")
             except Exception as e:
