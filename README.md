@@ -50,7 +50,7 @@ Integrate Intel RealSense cameras with FRC robots seamlessly.
 
 2. **Install Dependencies**
 
-   * Follow the same installation steps as Orange Pi 5.
+   * Follow the same installation steps as Orange Pi 5 (run the install.sh script).
 
 3. **Configure for QCS6490**
 
