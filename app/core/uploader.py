@@ -6,6 +6,7 @@ from fastapi import File, HTTPException, UploadFile
 from fastapi.responses import RedirectResponse
 
 from app.config import ConfigManager
+from app.constants import CHIP_TYPE_QCS6490
 from app.core import logging_config
 from convert_model import async_convert_model
 
@@ -48,16 +49,32 @@ async def upload_model(file: UploadFile = File(...)):
 
 
 def get_all_rknn_models() -> list[str]:
+    """Get all converted models (RKNN or ONNX depending on chip type)."""
     try:
         if not UPLOAD_FOLDER.exists():
             return []
 
-        return [
-            name
-            for name in os.listdir(UPLOAD_FOLDER)
-            if name.endswith("rknn_model") and (UPLOAD_FOLDER / name).is_dir()
-        ]
+        chip_type = ConfigManager().get().rknn_chip_type
+        
+        models = []
+        for path in UPLOAD_FOLDER.iterdir():
+            if not path.is_dir():
+                continue
+            
+            name = path.name
+            
+            # Accept both RKNN and ONNX model directories based on chip type
+            if chip_type == CHIP_TYPE_QCS6490:
+                # For QCS6490, look for ONNX model directories
+                name_lower = name.lower()
+                if ("onnx" in name_lower or CHIP_TYPE_QCS6490 in name_lower) and name.endswith("_model"):
+                    models.append(name)
+            elif name.endswith("_rknn_model"):
+                # For Rockchip chips, look for RKNN model directories
+                models.append(name)
+        
+        return models
 
     except Exception:
-        logger.exception("Failed to list rknn models", operation="list_models")
+        logger.exception("Failed to list models", operation="list_models")
         return []
