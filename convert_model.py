@@ -3,6 +3,8 @@ import os
 import subprocess
 import sys
 
+from app.constants import CHIP_TYPE_QCS6490, MODEL_FORMAT_ONNX, MODEL_FORMAT_RKNN
+
 realtime = []
 
 
@@ -13,11 +15,11 @@ def convert_model(model_path, chip="rk3588", imgsz=640):
     model_file = os.path.basename(model_path)
 
     # Use ONNX format for QCS6490 (Qualcomm NPU), RKNN for Rockchip chips
-    if chip == "qcs6490":
-        export_format = "onnx"
-        name = "qcs6490"
+    if chip == CHIP_TYPE_QCS6490:
+        export_format = MODEL_FORMAT_ONNX
+        name = CHIP_TYPE_QCS6490
     else:
-        export_format = "rknn"
+        export_format = MODEL_FORMAT_RKNN
         name = chip
 
     cmd = [

@@ -2,6 +2,7 @@ from ultralytics import YOLO
 
 import app.core.logging_config as logging_config
 from app.config import ConfigManager
+from app.constants import CHIP_TYPE_QCS6490
 
 logger = logging_config.get_logger(__name__)
 
@@ -16,7 +17,7 @@ class YOLODetector:
         chip_type = config.rknn_chip_type
         
         # Log chip-specific initialization
-        if chip_type == "qcs6490":
+        if chip_type == CHIP_TYPE_QCS6490:
             logger.info("Initializing for QCS6490 with ONNX Runtime", operation="init")
         else:
             logger.info(f"Initializing for {chip_type} with RKNN Runtime", operation="init")
