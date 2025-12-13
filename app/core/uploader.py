@@ -66,7 +66,7 @@ def get_all_rknn_models() -> list[str]:
             # Accept both RKNN and ONNX model directories based on chip type
             if chip_type == CHIP_TYPE_QCS6490:
                 # For QCS6490, look for ONNX model directories
-                if ("onnx" in name.lower() or "qcs" in name.lower()) and name.endswith("_model"):
+                if ("onnx" in name.lower() or CHIP_TYPE_QCS6490 in name.lower()) and name.endswith("_model"):
                     models.append(name)
             elif name.endswith("_rknn_model"):
                 # For Rockchip chips, look for RKNN model directories
