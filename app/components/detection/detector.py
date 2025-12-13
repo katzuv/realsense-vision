@@ -12,13 +12,27 @@ class YOLODetector:
             f"Initializing YOLO detector with model: {model_path}", operation="init"
         )
 
-        self.model = YOLO(model_path, task="detect")
+        config = ConfigManager().get()
+        chip_type = config.rknn_chip_type
+        
+        # Initialize YOLO model with chip-specific settings
+        if chip_type == "qcs6490":
+            # For QCS6490, use ONNX model with ONNX Runtime
+            # The QNN execution provider will be used if available
+            logger.info("Initializing for QCS6490 with ONNX Runtime", operation="init")
+            self.model = YOLO(model_path, task="detect")
+        else:
+            # For Rockchip chips (RK3588, RK3588s, RK3576, RK3568), use RKNN
+            logger.info(f"Initializing for {chip_type} with RKNN Runtime", operation="init")
+            self.model = YOLO(model_path, task="detect")
+        
         self.imgsz = imgsz
         self.results = None
         self.detection_count = 0
+        self.chip_type = chip_type
 
         logger.info(
-            f"YOLO detector initialized successfully (imgsz={imgsz})",
+            f"YOLO detector initialized successfully (chip={chip_type}, imgsz={imgsz})",
             operation="init",
             status="success",
         )

@@ -48,16 +48,32 @@ async def upload_model(file: UploadFile = File(...)):
 
 
 def get_all_rknn_models() -> list[str]:
+    """Get all converted models (RKNN or ONNX depending on chip type)."""
     try:
         if not UPLOAD_FOLDER.exists():
             return []
 
-        return [
-            name
-            for name in os.listdir(UPLOAD_FOLDER)
-            if name.endswith("rknn_model") and (UPLOAD_FOLDER / name).is_dir()
-        ]
+        chip_type = ConfigManager().get().rknn_chip_type
+        
+        models = []
+        for name in os.listdir(UPLOAD_FOLDER):
+            path = UPLOAD_FOLDER / name
+            if not path.is_dir():
+                continue
+            
+            # Accept both RKNN and ONNX model directories
+            if chip_type == "qcs6490":
+                # For QCS6490, look for directories with onnx or qcs6490 in name
+                if "onnx" in name.lower() or "qcs6490" in name.lower():
+                    if name.endswith("_model"):
+                        models.append(name)
+            else:
+                # For Rockchip chips, look for RKNN model directories
+                if name.endswith("rknn_model"):
+                    models.append(name)
+        
+        return models
 
     except Exception:
-        logger.exception("Failed to list rknn models", operation="list_models")
+        logger.exception("Failed to list models", operation="list_models")
         return []
