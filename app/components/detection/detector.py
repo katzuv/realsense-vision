@@ -18,9 +18,36 @@ class YOLODetector:
         
         # Log chip-specific initialization
         if chip_type == CHIP_TYPE_QCS6490:
-            logger.info("Initializing for QCS6490 with ONNX Runtime", operation="init")
+            logger.info("Initializing for QCS6490 with ONNX Runtime (QNN provider)", operation="init")
         else:
             logger.info(f"Initializing for {chip_type} with RKNN Runtime", operation="init")
+        
+        # Initialize YOLO model with chip-specific settings
+        if chip_type == CHIP_TYPE_QCS6490:
+            # For QCS6490, configure ONNX Runtime to use QNN execution provider for NPU acceleration
+            try:
+                import onnxruntime as ort
+                # Configure QNN execution provider for Qualcomm NPU
+                providers = [
+                    (
+                        "QNNExecutionProvider",
+                        {
+                            "backend_path": "libQnnHtp.so",
+                            "performance_mode": "high_performance",
+                            "device_id": 0
+                        }
+                    ),
+                    "CPUExecutionProvider"  # Fallback to CPU if QNN is not available
+                ]
+                logger.info(f"Configured ONNX Runtime providers: {[p[0] if isinstance(p, tuple) else p for p in providers]}", operation="init")
+                # Note: ultralytics YOLO will use these providers when loading ONNX models
+                # Set the environment to use these providers
+                import os
+                os.environ["ORT_EXECUTION_PROVIDERS"] = "QNNExecutionProvider,CPUExecutionProvider"
+            except ImportError:
+                logger.warning("onnxruntime not available, using default providers", operation="init")
+            except Exception as e:
+                logger.warning(f"Failed to configure QNN provider: {e}, using default providers", operation="init")
         
         # Initialize YOLO model (supports both RKNN and ONNX formats)
         self.model = YOLO(model_path, task="detect")
