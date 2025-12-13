@@ -47,17 +47,15 @@ Integrate Intel RealSense cameras with FRC robots seamlessly.
 1. **Setup Device**
 
    * Use the Rubik Pi 3 with a compatible Linux distribution.
-   * Ensure the Qualcomm Neural Processing SDK (SNPE or QNN) is properly configured for NPU acceleration.
 
 2. **Install Dependencies**
 
-   * Follow the same installation steps as Orange Pi 5, but ensure `rknn_chip_type` in `config.yaml` is set to `qcs6490`.
-   * The model will be converted to ONNX format for Qualcomm NPU compatibility.
+   * Follow the same installation steps as Orange Pi 5.
 
 3. **Configure for QCS6490**
 
    * Edit `config.yaml` and set: `rknn_chip_type: qcs6490`
-   * Models will be exported to ONNX format which can leverage the Qualcomm NPU through ONNX Runtime with QNN execution provider.
+   * Models will be exported to ONNX format for Qualcomm NPU compatibility.
 
 ## Model Training
 
